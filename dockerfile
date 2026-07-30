@@ -25,7 +25,7 @@ RUN pnpm Build
 FROM nginx:alpine AS production
 
 # Copiar hacia Nginx el resultado del build (carpeta dist)
-COPY --from=Build /app/dist /usr/share/nginx/html
+COPY --from=build /app/dist /usr/share/nginx/html
 
 #Puerto a exponer
 EXPOSE 80
