@@ -1,34 +1,34 @@
-# ETAPA 1
-# Imagen base para levantar el proyecto, -alpine significa es lo mas justo en espacio de node
-FROM node:22-alpine as Build
+# ETAPA #1
 
-#Establecer el directorio de trabajo dentro del contenedor.
+# Imagen base para levantar el proyecto
+FROM node:22-alpine AS build
+
+# Establecer el directorio de trabajo dentro del contenedor.
 WORKDIR /app
 
-#Instalar pnpm
+# Instalar pnpm
 RUN corepack enable
 
-# copiar primero solo los archivos de dependencias ./ significa que ya estoy en /app en docker
-COPY package.json pnpm-lock-yaml ./
+# Copiar primero solo los archivos de dependencias
+COPY package.json pnpm-lock.yaml ./
 
-#instalar las dependencias y --frozen-lockfile significa que copie exacto lo que estaba en mi pc
+# Instalar las dependencias
 RUN pnpm install --frozen-lockfile
 
-# copiar el codigo del proyecto
-
+# Copiar el codigo del proyecto
 COPY . .
 
 # Ejecutar el proyecto
-RUN pnpm Build
+RUN pnpm build
 
-# ETAPA 2: PRODUCCION (SACAR A INTERNET)
+# ETAPA 2: Produccion
 FROM nginx:alpine AS production
 
 # Copiar hacia Nginx el resultado del build (carpeta dist)
 COPY --from=build /app/dist /usr/share/nginx/html
 
-#Puerto a exponer
+# Puerto a exponer
 EXPOSE 80
 
-# comando para iniciar el contenedor
-CMD ["nginx","-g","daemon off"]
+# Comando para iniciar el contenedor
+CMD ["nginx", "-g", "daemon off"]
